@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">EcoSort AI</string>
+    <string name="tagline">Smart Waste Classification &amp; Disposal Guide</string>
+    <string name="sign_in_with_google">Sign in with Google</string>
+    <string name="sign_out">Sign out</string>
+    <string name="tab_classify">Classify</string>
+    <string name="tab_history">History</string>
+    <string name="tab_analytics">Analytics</string>
+    <string name="tab_guide">Guide</string>
+    <string name="upload_photo">Upload Photo</string>
+    <string name="live_camera">Live Camera</string>
+    <string name="capture_classify">Capture &amp; Classify</string>
+    <string name="analyzing_waste">Analyzing waste material…</string>
+    <string name="low_confidence_title">Low Confidence — Uncertain Result</string>
+    <string name="low_confidence_subtitle">Try capturing in brighter lighting or closer to the item, or pick the correct category below.</string>
+    <string name="export_report">Export Report</string>
+</resources>

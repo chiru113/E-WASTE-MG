@@ -1,0 +1,94 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global safety net: deny everything by default
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidCategory(category) {
+      return category in ['Plastic', 'Paper', 'Metal', 'Glass', 'Organic', 'Other'];
+    }
+
+    function isValidSourceType(sourceType) {
+      return sourceType in ['Camera', 'Upload'];
+    }
+
+    function isValidClassification(data, userId) {
+      return data.userId is string &&
+             data.userId == userId &&
+             data.userId.size() <= 128 &&
+             isValidCategory(data.category) &&
+             data.itemName is string &&
+             data.itemName.size() >= 1 &&
+             data.itemName.size() <= 120 &&
+             data.confidence is number &&
+             data.confidence >= 0.0 &&
+             data.confidence <= 1.0 &&
+             data.isUncertain is bool &&
+             data.disposalMethod is string &&
+             data.disposalMethod.size() >= 1 &&
+             data.disposalMethod.size() <= 500 &&
+             data.binColor is string &&
+             data.binColor.size() >= 1 &&
+             data.binColor.size() <= 80 &&
+             data.ecoTip is string &&
+             data.ecoTip.size() <= 300 &&
+             isValidSourceType(data.sourceType) &&
+             data.createdAt is timestamp &&
+             data.createdAt <= request.time;
+    }
+
+    match /users/{userId}/classifications/{classificationId} {
+      allow get: if isSignedIn() && request.auth.uid == userId && isValidId(classificationId);
+      allow list: if isSignedIn() && request.auth.uid == userId;
+
+      allow create: if isSignedIn() &&
+                       request.auth.uid == userId &&
+                       isValidId(classificationId) &&
+                       incoming().keys().hasAll([
+                         'userId', 'category', 'itemName', 'confidence',
+                         'isUncertain', 'disposalMethod', 'binColor',
+                         'ecoTip', 'sourceType', 'createdAt'
+                       ]) &&
+                       incoming().keys().hasOnly([
+                         'userId', 'category', 'itemName', 'confidence',
+                         'isUncertain', 'disposalMethod', 'binColor',
+                         'ecoTip', 'sourceType', 'createdAt'
+                       ]) &&
+                       isValidClassification(incoming(), userId);
+
+      allow update: if isSignedIn() &&
+                       request.auth.uid == userId &&
+                       isValidId(classificationId) &&
+                       incoming().userId == existing().userId &&
+                       incoming().createdAt == existing().createdAt &&
+                       incoming().confidence == existing().confidence &&
+                       incoming().sourceType == existing().sourceType &&
+                       isValidClassification(incoming(), userId) &&
+                       incoming().diff(existing()).affectedKeys().hasOnly([
+                         'category', 'itemName', 'disposalMethod',
+                         'binColor', 'ecoTip', 'isUncertain'
+                       ]);
+
+      allow delete: if isSignedIn() && request.auth.uid == userId && isValidId(classificationId);
+    }
+  }
+}

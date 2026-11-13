@@ -1,0 +1,6 @@
+{
+  "name": "EcoSort AI",
+  "description": "AI-powered smart waste classification and management app with camera and photo scanning, disposal guidance, classification history, and waste analytics.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

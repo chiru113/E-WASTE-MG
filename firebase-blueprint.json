@@ -1,0 +1,74 @@
+{
+  "entities": {
+    "WasteClassification": {
+      "title": "WasteClassification",
+      "description": "A single AI-powered waste classification scan record stored per user.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Authenticated Firebase Auth UID of the owner."
+        },
+        "category": {
+          "type": "string",
+          "enum": ["Plastic", "Paper", "Metal", "Glass", "Organic", "Other"],
+          "description": "Predicted waste category."
+        },
+        "itemName": {
+          "type": "string",
+          "description": "Identified waste item description (e.g., PET Plastic Bottle)."
+        },
+        "confidence": {
+          "type": "number",
+          "description": "Model confidence score between 0.0 and 1.0."
+        },
+        "isUncertain": {
+          "type": "boolean",
+          "description": "True when confidence is below the certainty threshold (0.65)."
+        },
+        "disposalMethod": {
+          "type": "string",
+          "description": "Recommended disposal and sorting procedure."
+        },
+        "binColor": {
+          "type": "string",
+          "description": "Recommended bin type or color label."
+        },
+        "ecoTip": {
+          "type": "string",
+          "description": "Additional preparation or environmental impact note."
+        },
+        "sourceType": {
+          "type": "string",
+          "enum": ["Camera", "Upload"],
+          "description": "Capture method used for this classification."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp written via FieldValue.serverTimestamp()."
+        }
+      },
+      "required": [
+        "userId",
+        "category",
+        "itemName",
+        "confidence",
+        "isUncertain",
+        "disposalMethod",
+        "binColor",
+        "ecoTip",
+        "sourceType",
+        "createdAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/users/{userId}/classifications/{classificationId}": {
+      "schema": {
+        "$ref": "#/entities/WasteClassification"
+      },
+      "description": "Per-user waste classification history and analytics records."
+    }
+  }
+}
